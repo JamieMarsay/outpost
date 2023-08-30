@@ -1,9 +1,16 @@
-import Image from "next/image";
+"use client";
+import React from "react";
+import GameGrid from "../components/Grid/Grid";
+// import Header from "../components/Header/Header";
+import { GameProvider } from "../context/Game/GameProvider";
 
-export default function Home() {
+export default function Page() {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      test
-    </main>
+    <GameProvider>
+      {/* <Header>test</Header> */}
+      <div className="md:w-6/12 mx-auto flex flex-col items-center justify-center h-screen">
+        <GameGrid />
+      </div>
+    </GameProvider>
   );
 }
