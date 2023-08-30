@@ -14,14 +14,15 @@ export const useTileMap = () => {
 
   // Generates a 3x3 outpost around the starting tile by setting tiles to owned by player
   const generateOutpost = (x: number, y: number, startingX: number, startingY: number) => {
-    if (y == startingY || y == startingY - 1 || y == startingY + 1) {
-      if (x == startingX - 1 || x == startingX + 1 || x == startingX) {
+    if (y == startingY || y == startingY + 1 || y == startingY + 2) {
+      if (x == startingX + 1 || x == startingX + 2 || x == startingX) {
         return true;
       }
     }
 
     return false;
   };
+
 
   // Change the properties of a given tile
   const modifyTile = (x: number, y: number, property, value) => {
@@ -54,8 +55,16 @@ export const useTileMap = () => {
 
   // Generate a tile for each coordinate on the grid with tile config & load into state
   const generateTiles = () => {
-    const startingX = Math.floor(Math.random() * tileCount);
-    const startingY = Math.floor(Math.random() * tileCount);
+    // Set an offset to prevent starting outpost from flowing over edge of grid.
+    const tileOffset = 2;
+    const startingX = Math.floor(Math.random() * (tileCount - tileOffset));
+    const startingY = Math.floor(Math.random() * (tileCount - tileOffset) );
+
+    // const startingX = 0;
+    // const startingY = 0;
+
+    console.log(startingX, startingY)
+
     const tiles = [];
 
     // Reset state to prevent duplicate tiles 
@@ -64,16 +73,16 @@ export const useTileMap = () => {
 
     // Generate tiles for each coordinate
     grid.y.forEach((y) =>
-      grid.x.forEach((x) =>
-        tiles.push({
-          id: `${x}-${y}`,
-          x,
-          y,
-          isPlayerOwned: generateOutpost(x, y, startingX, startingY),
-          isPlayerOutpost: x == startingX && y == startingY,
-          resource: randomResourceGenerator(),
-        })
-      )
+      grid.x.forEach((x) => {
+          tiles.push({
+            id: `${x}-${y}`,
+            x,
+            y,
+            isPlayerOwned: generateOutpost(x, y, startingX, startingY),
+            isPlayerOutpost: x == startingX + 1 && y == startingY + 1,
+            resource: randomResourceGenerator(),
+          })
+      })
     );
 
     setMapTiles(tiles);
