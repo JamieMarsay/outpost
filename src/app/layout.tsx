@@ -3,6 +3,7 @@ import "./globals.css";
 // import Header from "../components/Header/Header";
 // import Footer from "../components/Footer/Footer";
 import { GameProvider } from "../context/Game/GameProvider";
+import { QuizEngineProvider } from "../context/QuizEngine/QuizEngineProvider";
 
 export default function RootLayout({
   children,

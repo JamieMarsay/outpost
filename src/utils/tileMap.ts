@@ -1,9 +1,20 @@
-import { resources, randomResourceGenerator } from "./resources";
-import { useState, useEffect } from "react";
+import { IResource, randomResourceGenerator } from "./resources";
+import { useState } from "react";
+
+interface ITile {
+  id: string;
+  x: number;
+  y: number;
+  isPlayerOwned: boolean;
+  isPlayerOutpost: boolean;
+  resource: IResource | null;
+}
+
+type EditableTileProperties = "isPlayerOwned";
 
 export const useTileMap = () => {
-  const [mapTiles, setMapTiles] = useState([]);
-  const [playerTiles, setPlayerTiles] = useState([]);
+  const [mapTiles, setMapTiles] = useState<ITile[]>([]);
+  const [playerTiles, setPlayerTiles] = useState<ITile[]>([]);
   const tileCount = 13;
 
   // Generate a grid of x and y coordinates
@@ -12,21 +23,9 @@ export const useTileMap = () => {
     y: [...Array(tileCount).keys()],
   };
 
-  // Generates a 3x3 outpost around the starting tile by setting tiles to owned by player
-  const generateOutpost = (x: number, y: number, startingX: number, startingY: number) => {
-    if (y == startingY || y == startingY + 1 || y == startingY + 2) {
-      if (x == startingX + 1 || x == startingX + 2 || x == startingX) {
-        return true;
-      }
-    }
-
-    return false;
-  };
-
-
   // Change the properties of a given tile
-  const modifyTile = (x: number, y: number, property, value) => {
-    console.log(mapTiles)
+  const modifyTile = (tile: ITile, property: EditableTileProperties, value: string | number | boolean) => {
+    const { x, y } = tile;
     const tilesCopy = [...mapTiles];
     const tileIndex = mapTiles.findIndex((tile) => tile.id == `${x}-${y}`);
     tilesCopy[tileIndex][property] = value;
@@ -38,14 +37,14 @@ export const useTileMap = () => {
     const tileIndex = mapTiles.findIndex((tile) => tile.id == `${x}-${y}`);
   
     if (
-      mapTiles[tileIndex - 1] ||
-      mapTiles[tileIndex + 1] ||
-      mapTiles[tileIndex + tileCount] ||
-      mapTiles[tileIndex - tileCount] ||
-      mapTiles[tileIndex + tileCount + 1] ||
-      mapTiles[tileIndex + tileCount - 1] ||
-      mapTiles[tileIndex - tileCount + 1] ||
-      mapTiles[tileIndex - tileCount - 1]
+      mapTiles[tileIndex - 1].isPlayerOwned ||
+      mapTiles[tileIndex + 1].isPlayerOwned ||
+      mapTiles[tileIndex + tileCount].isPlayerOwned ||
+      mapTiles[tileIndex - tileCount].isPlayerOwned ||
+      mapTiles[tileIndex + tileCount + 1].isPlayerOwned ||
+      mapTiles[tileIndex + tileCount - 1].isPlayerOwned ||
+      mapTiles[tileIndex - tileCount + 1].isPlayerOwned ||
+      mapTiles[tileIndex - tileCount - 1].isPlayerOwned
     ) {
       return true;
     } else {
@@ -53,62 +52,64 @@ export const useTileMap = () => {
     }
   };
 
+  // Claims a tile for the player after checking if it is next to a player owned tile
+  const claimPlayerTile = (tile: ITile) => {
+    const { x, y } = tile;
+
+    if(checkIfNextToPlayerOwnedTile(x, y)) {
+      modifyTile(tile, "isPlayerOwned", true);
+    }
+  };
+
+  // Generates a 3x3 outpost drawn from the top left most tile starting at startingX, startingY
+  const setStartingTiles = (x: number, y: number, startingX: number, startingY: number) => {
+    if (y == startingY || y == startingY + 1 || y == startingY + 2) {
+      if (x == startingX + 1 || x == startingX + 2 || x == startingX) {
+        return true;
+      }
+    }
+
+    return false;
+  };
+
   // Generate a tile for each coordinate on the grid with tile config & load into state
   const generateTiles = () => {
     // Set an offset to prevent starting outpost from flowing over edge of grid.
     const tileOffset = 2;
     const startingX = Math.floor(Math.random() * (tileCount - tileOffset));
-    const startingY = Math.floor(Math.random() * (tileCount - tileOffset) );
+    const startingY = Math.floor(Math.random() * (tileCount - tileOffset));
+    const tiles: ITile[] = [];
 
-    // const startingX = 0;
-    // const startingY = 0;
-
-    console.log(startingX, startingY)
-
-    const tiles = [];
-
-    // Reset state to prevent duplicate tiles 
+    // Reset state to prevent duplicate tiles on re-roll
     setMapTiles([]);
     setPlayerTiles([]);
 
     // Generate tiles for each coordinate
     grid.y.forEach((y) =>
       grid.x.forEach((x) => {
-          tiles.push({
-            id: `${x}-${y}`,
-            x,
-            y,
-            isPlayerOwned: generateOutpost(x, y, startingX, startingY),
-            isPlayerOutpost: x == startingX + 1 && y == startingY + 1,
-            resource: randomResourceGenerator(),
-          })
+        const tileIsPlayerOwned = setStartingTiles(x, y, startingX, startingY);
+        const tileIsPlayerOutpost = x == startingX + 1 && y == startingY + 1;
+
+        tiles.push({
+          id: `${x}-${y}`, 
+          x,
+          y,
+          isPlayerOwned: tileIsPlayerOwned || tileIsPlayerOutpost,
+          isPlayerOutpost: tileIsPlayerOutpost,
+          resource: tileIsPlayerOwned ? randomResourceGenerator(5) : randomResourceGenerator(),
+        })
       })
     );
 
     setMapTiles(tiles);
     setPlayerTiles(tiles.filter((tile) => tile.isPlayerOwned));
-
-    // // Set initial outpost tile with resource
-    // const randomPlayerTile = tiles.find(
-    //   (tile) => tile.isPlayerOwned && !tile.isPlayerOutpost
-    // );
-
-    // modifyTile(
-    //   randomPlayerTile.x,
-    //   randomPlayerTile.y,
-    //   "resource",
-    //   resources[0],
-    // );
   };
-
-  useEffect(() => {
-    generateTiles();
-  }, []);
 
   return {
     mapTiles,
     playerTiles,
     generateTiles,
+    claimPlayerTile
   }
 }
 

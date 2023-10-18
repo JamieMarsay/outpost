@@ -1,5 +1,10 @@
+export interface IResource {
+  type: "food" | "ore" | "gold";
+  icon: "grass" | "terrain" | "join_inner";
+  output: number;
+}
 
-export const resources = [
+export const resources: IResource[] = [
   {
     type: "food",
     icon: "grass",
@@ -17,7 +22,7 @@ export const resources = [
   },
 ];
 
-export const randomResourceGenerator = () => {
-  const randomResource = Math.floor(Math.random() * 50);
+export const randomResourceGenerator = (rarity: number = 50) => {
+  const randomResource = Math.floor(Math.random() * rarity);
   return resources[randomResource] || false;
 };

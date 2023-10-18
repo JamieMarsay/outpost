@@ -3,20 +3,15 @@ import Tile from "../Tile/Tile";
 import { GameContext } from "../../context/Game/GameProvider";
 
 const GameGrid = () => {
-  const {
-    mapTiles,
-    generateTiles,
-    modifyTile,
-    checkIfNextToPlayerOwnedTile,
-    endDay,
-  } = useContext(GameContext);
+  const { endDay, generateTiles, mapTiles, claimPlayerTile } =
+    useContext(GameContext);
 
   return (
     <div className="flex flex-wrap w-[509px]">
       {mapTiles.map((tile) => (
         <Tile
           onClick={() => {
-            console.log(tile);
+            claimPlayerTile(tile);
           }}
           key={`${tile.x}-${tile.y}`}
           config={tile}
