@@ -2,8 +2,8 @@
 
 import React from "react";
 
-const createQuiz = () => {
+const CreateQuiz = () => {
   return <div>createQuiz</div>;
 };
 
-export default createQuiz;
+export default CreateQuiz;
