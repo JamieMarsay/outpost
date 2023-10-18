@@ -5,7 +5,7 @@ import { QuizEnginecontext } from "../../../../context/QuizEngine/QuizEngineProv
 import QuizStudio from "@/components/QuizStudio/QuizStudio";
 import { useRouter } from "next/navigation";
 
-const page = () => {
+const Page = () => {
   const { quizEngineState } = useContext(QuizEnginecontext);
   const { selectedQuiz } = quizEngineState;
   const router = useRouter();
@@ -25,4 +25,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default Page;

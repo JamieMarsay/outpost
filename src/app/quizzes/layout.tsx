@@ -4,7 +4,7 @@ import { QuizEngineProvider } from "../../context/QuizEngine/QuizEngineProvider"
 const layout = ({ children }) => {
   return (
     <QuizEngineProvider>
-      <div className="p-6">{children}</div>
+      <div className="p-63">{children}</div>
     </QuizEngineProvider>
   );
 };
