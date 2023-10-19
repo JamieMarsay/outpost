@@ -47,30 +47,38 @@ const testQuizzes = [
 
 const quizReducer = (state, action) => {
   switch (action.type) {
+    // Toggles various features of the studio on/off
+    case "SET_MODE":
+      return {
+        ...state,
+        mode: action.data,
+      };
+
+    // Updates the current quiz once the user saves their changes
     case "EDIT_QUIZ":
       return {
         ...state,
-        selectedQuiz: state.quizzes.find((quiz) => quiz.id === action.data),
+        quizzes: state.quizzes.map((quiz) =>
+          quiz.id === action.data.id ? { ...quiz, ...action.data } : quiz
+        ),
       };
 
+    // Stores the new quiz in state
     case "CREATE_QUIZ":
-      console.log("quiz created");
-
-    case "EDIT_QUESTION":
       return {
         ...state,
-        selectedQuestion: action.data,
+        quizzes: [...state.quizzes, action.data],
       };
 
-    case "ADD_QUESTION": {
-      return {
-        ...state,
-        selectedQuiz: {
-          ...state.selectedQuiz,
-          questions: [...state.selectedQuiz.questions, action.data],
-        },
-      };
-    }
+    // case "ADD_QUESTION": {
+    //   return {
+    //     ...state,
+    //     selectedQuiz: {
+    //       ...state.selectedQuiz,
+    //       questions: [...state.selectedQuiz.questions, action.data],
+    //     },
+    //   };
+    // }
   }
 };
 
@@ -80,12 +88,27 @@ export const QuizEngineProvider = ({ children }: { children: ReactNode }) => {
     selectedQuiz: {},
     previewMode: false,
     selectedQuestion: {},
+    mode: "VIEW",
   });
 
-  console.log(quizEngineState);
+  const toggleQuizEngineMode = () => {
+    if (quizEngineState.mode === "VIEW") {
+      quizEngineDispatch({
+        type: "SET_MODE",
+        data: "EDIT",
+      });
+    } else if (quizEngineState.mode === "EDIT" || "CREATE") {
+      quizEngineDispatch({
+        type: "SET_MODE",
+        data: "VIEW",
+      });
+    }
+  };
 
   return (
-    <QuizEnginecontext.Provider value={{ quizEngineState, quizEngineDispatch }}>
+    <QuizEnginecontext.Provider
+      value={{ quizEngineState, quizEngineDispatch, toggleQuizEngineMode }}
+    >
       {children}
     </QuizEnginecontext.Provider>
   );

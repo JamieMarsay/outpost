@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useContext } from "react";
+import React, { useEffect, useContext, useState } from "react";
 import QuestionsList from "./QuestionsList/QuestionsList";
 import QuestionPreview from "./QuestionPreview/QuestionPreview";
 import { useRouter } from "next/navigation";
@@ -8,27 +8,54 @@ import { Icon } from "../Icon/Icon";
 import { QuizEnginecontext } from "../../context/QuizEngine/QuizEngineProvider";
 
 const QuizStudio = ({ quiz }) => {
-  const { title, questions } = quiz;
-  const { quizEngineState, quizEngineDispatch } = useContext(QuizEnginecontext);
+  const { quizEngineState, quizEngineDispatch, toggleQuizEngineMode } =
+    useContext(QuizEnginecontext);
   const router = useRouter();
+  const [quizState, setQuizState] = useState(quiz);
 
-  useEffect(() => {
-    // Set first question as default selected question
-    quizEngineDispatch({
-      type: "EDIT_QUESTION",
-      data: questions[0],
-    });
-  }, []);
+  const { mode } = quizEngineState;
+
+  const handleQuizChanges = () => {
+    if (mode === "CREATE") {
+      quizEngineDispatch({ type: "CREATE_QUIZ", data: quizState });
+    } else if (mode === "EDIT") {
+      quizEngineDispatch({ type: "EDIT_QUIZ", data: quizState });
+    }
+  };
 
   return (
     <div>
+      <h1>CURRENT ENGINE MODE: {mode}</h1>
       <div className="flex justify-between">
-        <h1 className="text-xl">{title}</h1>
+        <span className="mb-2">
+          <input
+            placeholder="Quiz title"
+            onChange={(e) =>
+              setQuizState((prev: any) => ({ ...prev, title: e.target.value }))
+            }
+            disabled={mode === "VIEW"}
+            className="bg-transparent border-b-2 border-black p-2"
+            value={quizState.title}
+          />
+          {mode !== "VIEW" && <Icon name="edit" />}
+        </span>
         <div className="flex">
           <button className="mr-2 flex items-center">
             <Icon className="mr-1" name="image" />
             <span>Preview</span>
           </button>
+          <button
+            onClick={() => {
+              handleQuizChanges();
+              toggleQuizEngineMode();
+            }}
+            className="mr-2 flex items-center"
+          >
+            <Icon className="mr-1" name={mode === "VIEW" ? "edit" : "save"} />
+
+            <span>{mode === "VIEW" ? "Edit quiz" : "Save changes"}</span>
+          </button>
+
           <button
             onClick={() => router.back()}
             className="mr-2 flex items-center"
@@ -39,12 +66,10 @@ const QuizStudio = ({ quiz }) => {
         </div>
       </div>
       <div className="flex">
-        <QuestionsList questions={questions} />
-        <div className="flex-1">
-          <QuestionPreview
-            selectedQuestion={quizEngineState.selectedQuestion}
-          />
-        </div>
+        <QuestionPreview
+          questions={quizState.questions}
+          setQuizState={setQuizState}
+        />
       </div>
     </div>
   );
