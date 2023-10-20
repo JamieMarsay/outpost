@@ -9,7 +9,6 @@ import Link from "next/link";
 const Quizzes = () => {
   const { quizEngineState, quizEngineDispatch } = useContext(QuizEnginecontext);
   const { quizzes } = quizEngineState;
-  const router = useRouter();
 
   return (
     <div>
@@ -20,9 +19,12 @@ const Quizzes = () => {
           Create a new quiz
         </Link>
       </div>
-      <div className="grid grid-cols-12">
+      <div className="grid grid-cols-6">
         {quizzes.map((quiz) => (
-          <div key={quiz.id}>
+          <div
+            className="min-w-max mr-2 border-2 border-black rounded-md p-2"
+            key={quiz.id}
+          >
             <h3>{quiz.title}</h3>
             <p>{quiz.questions.length} questions</p>
             <Link href={`/quizzes/view-quiz/${quiz.id}`}>View quiz</Link>

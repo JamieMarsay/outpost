@@ -16,14 +16,8 @@ const QuestionPreview = ({ questions, setQuizState }) => {
   });
   const [addingNewQuestion, toggleAddingNewQuestion] = useState(false);
 
-  const blankQuestion = {
-    id: `${questions.length}`,
-    title: "",
-    preview: "https://picsum.photos/200",
-  };
-
   const addNewQuestion = (questionToAdd) => {
-    // Create new question
+    // Add new question to quiz
     setQuizState((prev: any) => ({
       ...prev,
       questions: [
@@ -33,6 +27,16 @@ const QuestionPreview = ({ questions, setQuizState }) => {
           id: `${prev.questions.length + 1}`,
         },
       ],
+    }));
+  };
+
+  const deleteQuestion = () => {
+    // Delete question from quiz
+    setQuizState((prev: any) => ({
+      ...prev,
+      questions: prev.questions.filter(
+        (question) => question.id !== selectedQuestion.id
+      ),
     }));
   };
 
@@ -102,9 +106,17 @@ const QuestionPreview = ({ questions, setQuizState }) => {
     ],
   };
 
+  useEffect(() => {
+    if (questions.length === 0) {
+      setSelectedQuestion({});
+    } else {
+      setSelectedQuestion(questions[0]);
+    }
+  }, [questions.length]);
+
   return (
     <div className="flex">
-      <div className="flex flex-col w-28">
+      <div className="flex flex-col w-28 ">
         <h2>{questions.length} Questions</h2>
         {mode !== "VIEW" && (
           <button
@@ -114,23 +126,36 @@ const QuestionPreview = ({ questions, setQuizState }) => {
             <Icon name="add" />
           </button>
         )}
-        {questions.map((question) => (
-          <div className="mb-2" key={question.id}>
-            <button onClick={() => setSelectedQuestion(question)}>
-              <Image
-                width={100}
-                height={100}
-                src={question.preview}
-                alt="A quiz question preview"
-              />
-            </button>
-          </div>
-        ))}
+        <div className="max-h-[50vh] overflow-scroll">
+          {questions.map((question) => (
+            <div className="mb-2" key={question.id}>
+              <button onClick={() => setSelectedQuestion(question)}>
+                <Image
+                  width={100}
+                  height={100}
+                  src={question.preview}
+                  alt="A quiz question preview"
+                />
+              </button>
+            </div>
+          ))}
+        </div>
       </div>
       <div className="flex-1">
-        {mode === "VIEW" && (
+        {selectedQuestion?.preview && (
           <>
-            <p>{selectedQuestion.title}</p>
+            <div className="flex  items-center justify-between">
+              <p className="mr-6">{selectedQuestion.title}</p>
+              {mode !== "VIEW" && (
+                <button
+                  className="flex items-center"
+                  onClick={() => deleteQuestion()}
+                >
+                  <Icon name="delete" className="mr-2" />
+                  <span>Delete question</span>
+                </button>
+              )}
+            </div>
             <Image
               width={100}
               height={100}

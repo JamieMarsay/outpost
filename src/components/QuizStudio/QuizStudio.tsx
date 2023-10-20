@@ -23,6 +23,8 @@ const QuizStudio = ({ quiz }) => {
     }
   };
 
+  console.log(quizState);
+
   return (
     <div>
       <h1>CURRENT ENGINE MODE: {mode}</h1>
