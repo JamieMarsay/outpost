@@ -1,6 +1,7 @@
 "use client";
 
 import React, { ReactNode, createContext, useReducer } from "react";
+import { randomImageGenerator } from "@/utils/randomImageGenerator";
 
 export const QuizEnginecontext = createContext({});
 
@@ -15,17 +16,17 @@ const testQuizzes = [
       {
         id: "1",
         title: "This is a question about multiplication",
-        preview: "https://picsum.photos/200",
+        preview: randomImageGenerator(),
       },
       {
         id: "2",
         title: "This is a question about subtraction",
-        preview: "https://picsum.photos/200",
+        preview: randomImageGenerator(),
       },
       {
         id: "3",
         title: "This is a question about division",
-        preview: "https://picsum.photos/200",
+        preview: randomImageGenerator(),
       },
     ],
   },
@@ -39,7 +40,7 @@ const testQuizzes = [
       {
         id: "1",
         title: "This is a question about biology",
-        preview: "https://picsum.photos/200",
+        preview: randomImageGenerator(),
       },
     ],
   },
