@@ -5,6 +5,7 @@ import QuizStudio from "@/components/QuizStudio/QuizStudio";
 import { QuizEnginecontext } from "../../../context/QuizEngine/QuizEngineProvider";
 
 const CreateQuiz = ({}) => {
+  // @ts-ignore;
   const { quizEngineDispatch } = useContext(QuizEnginecontext);
 
   const newQuiz = {
